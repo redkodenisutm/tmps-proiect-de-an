@@ -1,0 +1,87 @@
+generator client {
+    provider        = "prisma-client-js"
+    previewFeatures = ["referentialIntegrity"]
+}
+
+datasource db {
+    provider             = "mysql"
+    url                  = env("DATABASE_URL")
+    shadowDatabaseUrl    = env("SHADOW_DATABASE_URL")
+    referentialIntegrity = "prisma"
+}
+
+model User {
+    id       Int    @id @default(autoincrement())
+    email    String @unique
+    password String
+    cvs      CV[]
+}
+
+model Category {
+    id     Int     @id @default(autoincrement())
+    name   String  @unique
+    offers Offer[]
+}
+
+model Company {
+    id           Int     @id @default(autoincrement())
+    name         String  @unique
+    description  String
+    logo         String
+    creatorId    Int
+    website      String
+    supportEmail String
+    supportPhone String
+    offers       Offer[]
+}
+
+model Offer {
+    id            Int      @id @default(autoincrement())
+    categoryId    Int
+    category      Category @relation(fields: [categoryId], references: [id])
+    companyId     Int
+    company       Company  @relation(fields: [companyId], references: [id])
+    title         String
+    description   String
+    content       String
+    email         String
+    city          String
+    education     String
+    experience    String
+    salary        Float
+    workSchedule  String
+    datePublished DateTime
+    applies       Apply[]
+}
+
+model CV {
+    id            Int      @id @default(autoincrement())
+    userId        Int
+    user          User     @relation(fields: [userId], references: [id])
+    photo         String
+    firstName     String
+    lastName      String
+    birthdate     DateTime
+    city          String
+    canDisclocate Boolean  @default(false)
+    sex           String
+    email         String
+    phone         String
+    experience    String
+    education     String
+    aditional     String
+    applies       Apply[]
+    parentCvId   Int      @default(0)
+}
+
+model Apply {
+    id           Int    @id @default(autoincrement())
+    offerId      Int
+    offer        Offer  @relation(fields: [offerId], references: [id])
+    cvId         Int
+    cv           CV     @relation(fields: [cvId], references: [id])
+    fullname     String @default("")
+    experience   String @default("")
+    contactPhone String @default("")
+    status       String
+}
